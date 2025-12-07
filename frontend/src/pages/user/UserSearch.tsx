@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Search, TrendingUp, Loader2, Zap } from "lucide-react";
 import {
 	searchProducts,
@@ -10,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import { useAppStore } from "@/store/appStore";
 import {
 	Select,
 	SelectContent,
@@ -23,6 +25,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function UserSearch() {
 	const { toast } = useToast();
+	const [searchParams] = useSearchParams();
+	const { addSearchHistory } = useAppStore();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [searchResults, setSearchResults] = useState<ProductGroup[]>([]);
 	const [liveDeals, setLiveDeals] = useState<Deal[]>([]);
@@ -44,6 +48,26 @@ export default function UserSearch() {
 	useEffect(() => {
 		loadLiveDeals();
 	}, []);
+
+	// Handle URL query parameter
+	useEffect(() => {
+		const query = searchParams.get("q");
+		if (query) {
+			setSearchQuery(query);
+			// Trigger search automatically
+			searchProducts(query, {})
+				.then((response) => {
+					setSearchResults(response.products);
+					setFromCache(response.fromCache);
+					setShouldSuggestScraping(
+						response.products.length === 0 && !response.fromCache
+					);
+				})
+				.catch((error) => {
+					console.error("Search failed:", error);
+				});
+		}
+	}, [searchParams]);
 
 	const loadLiveDeals = async () => {
 		try {
@@ -72,6 +96,10 @@ export default function UserSearch() {
 		try {
 			setLoading(true);
 			setShouldSuggestScraping(false);
+
+			// Add to search history
+			addSearchHistory(searchQuery);
+
 			const response = await searchProducts(searchQuery, {
 				platforms: selectedPlatforms.length > 0 ? selectedPlatforms : undefined,
 				sortBy,

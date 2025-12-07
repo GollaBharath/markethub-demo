@@ -18,6 +18,7 @@ import {
 } from "@/api/tracklistApi";
 import { getProductById } from "@/api/dealApi";
 import { useToast } from "@/hooks/use-toast";
+import { PriceHistoryChart } from "@/components/common/PriceHistoryChart";
 
 export default function UserTracklist() {
 	const [tracklist, setTracklist] = useState<any[]>([]);

@@ -5,7 +5,6 @@ import {
 	getAllSellers,
 	getAllProducts,
 	getSalesTrends,
-	getSystemLogs,
 	deleteUser,
 	deleteProduct,
 	updateProduct,
@@ -39,8 +38,5 @@ router.put("/products/:productId", protect, adminOnly, updateProduct);
 
 // Trends
 router.get("/trends", protect, adminOnly, getSalesTrends);
-
-// Logs
-router.get("/logs", protect, adminOnly, getSystemLogs);
 
 export default router;

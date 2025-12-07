@@ -48,10 +48,4 @@ export const adminApi = {
 		const { data } = await axiosInstance.get("/admin/trends");
 		return data;
 	},
-
-	// Logs
-	getSystemLogs: async () => {
-		const { data } = await axiosInstance.get("/admin/logs");
-		return data;
-	},
 };

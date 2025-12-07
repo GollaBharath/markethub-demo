@@ -419,9 +419,9 @@ export const getProductById = async (req: AuthRequest, res: Response) => {
 	try {
 		const { productId } = req.params;
 
-		// Find the main product
+		// Find the main product by productId (custom field, not _id)
 		const mainProduct = await Deal.findOne({
-			$or: [{ _id: productId }, { productId: productId }],
+			productId: productId,
 			isActive: true,
 		});
 

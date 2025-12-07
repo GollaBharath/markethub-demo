@@ -46,7 +46,6 @@ import AdminUsers from "@/pages/admin/AdminUsers";
 import AdminSellers from "@/pages/admin/AdminSellers";
 import AdminProducts from "@/pages/admin/AdminProducts";
 import AdminTrends from "@/pages/admin/AdminTrends";
-import AdminLogs from "@/pages/admin/AdminLogs";
 import AdminManage from "@/pages/admin/AdminManage";
 import AdminReports from "@/pages/admin/AdminReports";
 import AdminSettings from "@/pages/admin/AdminSettings";
@@ -104,7 +103,6 @@ const App = () => (
 						<Route path="/admin/sellers" element={<AdminSellers />} />
 						<Route path="/admin/products" element={<AdminProducts />} />
 						<Route path="/admin/trends" element={<AdminTrends />} />
-						<Route path="/admin/logs" element={<AdminLogs />} />
 						<Route path="/admin/reports" element={<AdminReports />} />
 						<Route path="/admin/manage" element={<AdminManage />} />
 						<Route path="/admin/settings" element={<AdminSettings />} />

@@ -191,63 +191,6 @@ export const getSalesTrends = async (req: Request, res: Response) => {
 	}
 };
 
-// Get system logs (activity logs)
-export const getSystemLogs = async (req: Request, res: Response) => {
-	try {
-		// Get recent user activities
-		const recentUsers = await User.find()
-			.sort({ updatedAt: -1 })
-			.limit(50)
-			.select("name email role updatedAt createdAt");
-
-		// Get recent product updates
-		const recentProducts = await Deal.find()
-			.sort({ lastScraped: -1 })
-			.limit(50)
-			.select("title platform lastScraped createdAt");
-
-		// Get recent alerts
-		const recentAlerts = await Alert.find()
-			.sort({ createdAt: -1 })
-			.limit(50)
-			.populate("user", "name email");
-
-		const logs = [
-			...recentUsers.map((u) => ({
-				id: u._id,
-				type: "user",
-				action:
-					u.createdAt.getTime() === u.updatedAt.getTime()
-						? "registered"
-						: "updated",
-				description: `User ${u.name} (${u.role})`,
-				timestamp: u.updatedAt,
-			})),
-			...recentProducts.map((p) => ({
-				id: p._id,
-				type: "product",
-				action: "scraped",
-				description: `${p.title} on ${p.platform}`,
-				timestamp: p.lastScraped,
-			})),
-			...recentAlerts.map((a: any) => ({
-				id: a._id,
-				type: "alert",
-				action: "created",
-				description: `Alert for ${a.productId} by ${a.user?.name || "Unknown"}`,
-				timestamp: a.createdAt,
-			})),
-		].sort(
-			(a, b) =>
-				new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-		);
-
-		res.json({ logs: logs.slice(0, 100) });
-	} catch (error: any) {
-		res.status(500).json({ error: error.message });
-	}
-};
-
 // Delete user
 export const deleteUser = async (req: Request, res: Response) => {
 	try {
