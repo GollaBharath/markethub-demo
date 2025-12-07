@@ -7,6 +7,8 @@ import cors from "cors";
 import connectDB from "./config/database";
 import { connectQueue } from "./config/rabbit";
 import adminAuthRoutes from "./routes/adminAuthRoutes";
+import adminRoutes from "./routes/adminRoutes";
+import sellerRoutes from "./routes/sellerRoutes";
 
 import authRoutes from "./routes/authRoutes";
 import testRoutes from "./routes/testRoutes";
@@ -29,6 +31,8 @@ app.use(cors());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", adminAuthRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/seller", sellerRoutes);
 app.use("/api/test", testRoutes);
 app.use("/api/tracklist", tracklistRoutes);
 app.use("/api/scrape", scraperRoutes);

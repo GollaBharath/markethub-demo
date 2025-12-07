@@ -414,6 +414,121 @@ export const triggerLiveScraping = async (req: AuthRequest, res: Response) => {
 	}
 };
 
+// Get product by ID with all platform variants
+export const getProductById = async (req: AuthRequest, res: Response) => {
+	try {
+		const { productId } = req.params;
+
+		// Find the main product
+		const mainProduct = await Deal.findOne({
+			$or: [{ _id: productId }, { productId: productId }],
+			isActive: true,
+		});
+
+		if (!mainProduct) {
+			return res.status(404).json({ message: "Product not found" });
+		}
+
+		// Find similar products from other platforms
+		const similarProducts = await Deal.find({
+			normalizedTitle: mainProduct.normalizedTitle,
+			isActive: true,
+			expiresAt: { $gt: new Date() },
+		});
+
+		// Group by platform
+		const prices: any = {};
+		similarProducts.forEach((deal) => {
+			prices[deal.platform] = {
+				price: deal.price,
+				url: deal.url,
+				originalPrice: deal.originalPrice,
+				discount: deal.discount,
+			};
+		});
+
+		// Get price history for this product
+		const PriceHistory = (await import("../models/PriceHistory")).default;
+		const priceHistory = await PriceHistory.find({
+			productId: { $in: similarProducts.map((d) => d.productId) },
+		})
+			.sort({ timestamp: 1 })
+			.limit(90);
+
+		// Format price history by date
+		const priceHistoryByDate: any = {};
+		priceHistory.forEach((record) => {
+			const date = record.timestamp.toISOString().split("T")[0];
+			if (!priceHistoryByDate[date]) {
+				priceHistoryByDate[date] = {};
+			}
+			// Find which platform this record belongs to
+			const deal = similarProducts.find(
+				(d) => d.productId === record.productId
+			);
+			if (deal) {
+				priceHistoryByDate[date][deal.platform] = record.price;
+			}
+		});
+
+		const priceHistoryArray = Object.entries(priceHistoryByDate).map(
+			([date, prices]) => ({
+				date,
+				...(prices as object),
+			})
+		);
+
+		// Build product response
+		const product = {
+			id: mainProduct._id,
+			productId: mainProduct.productId,
+			name: mainProduct.title,
+			category: mainProduct.category || "General",
+			brand: mainProduct.brand,
+			image: mainProduct.image,
+			rating: mainProduct.rating || 0,
+			reviewCount: mainProduct.reviews || 0,
+			description: `${mainProduct.title} - Available across multiple platforms`,
+			prices,
+			priceHistory: priceHistoryArray,
+			availability: true,
+			buyRecommendation: calculateBuyRecommendation(
+				mainProduct.price,
+				priceHistoryArray
+			),
+		};
+
+		res.json(product);
+	} catch (err) {
+		console.error("GET PRODUCT ERROR:", err);
+		return res.status(500).json({
+			message: "Failed to fetch product",
+			error: err,
+		});
+	}
+};
+
+// Helper: Calculate buy recommendation based on price history
+function calculateBuyRecommendation(
+	currentPrice: number,
+	priceHistory: any[]
+): string {
+	if (priceHistory.length < 5) return "neutral";
+
+	const prices = priceHistory
+		.map((h) => Object.values(h).filter((v) => typeof v === "number"))
+		.flat() as number[];
+
+	if (prices.length === 0) return "neutral";
+
+	const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+	const minPrice = Math.min(...prices);
+
+	if (currentPrice <= minPrice * 1.05) return "good"; // Within 5% of lowest
+	if (currentPrice >= avgPrice * 1.15) return "high"; // 15% above average
+	return "neutral";
+}
+
 // Helper: Clear search cache
 async function clearSearchCache() {
 	try {

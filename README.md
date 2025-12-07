@@ -97,12 +97,41 @@ markethub-demo/
    ```bash
    cd backend
    npm install
-   cp .env.example .env
-   # Edit .env with your configuration
+   ```
+
+   **Configure Environment Variables** (`backend/.env`):
+
+   ```env
+   MONGODB_URI=mongodb://127.0.0.1:27017/markethub
+   JWT_SECRET=your_super_secret_jwt_key_change_this
+   PORT=5000
+   REDIS_URL=redis://127.0.0.1:6379  # Optional
+   RABBITMQ_URL=amqp://localhost      # Optional
+   ```
+
+3. **⚠️ Generate Mock Data (REQUIRED)**
+
+   ```bash
+   cd backend
+   npm run seed
+   ```
+
+   **This step is mandatory!** The seed script generates:
+
+   - 61 users (1 admin, 10 sellers, 50 users)
+   - ~45-60 products across 5 platforms
+   - 90 days of price history
+   - 30 price alerts
+   - User tracklists
+
+4. **Start Backend Server**
+
+   ```bash
+   cd backend
    npm run dev
    ```
 
-3. **Setup Frontend**
+5. **Setup Frontend**
 
    ```bash
    cd frontend
@@ -110,27 +139,56 @@ markethub-demo/
    npm run dev
    ```
 
-4. **Access the Application**
+6. **Access the Application**
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:5000
 
-### Environment Variables
+### 🔑 Default Login Credentials
 
-#### Backend (.env)
+After running `npm run seed`, login with these accounts:
 
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/markethub
-JWT_SECRET=your-secret-key-here
-REDIS_URL=redis://localhost:6379
-RABBITMQ_URL=amqp://localhost
-NODE_ENV=development
-```
+**Admin:**
 
-#### Frontend (.env)
+- Email: `admin@markethub.com`
+- Password: `password123`
 
-```env
-VITE_API_URL=http://localhost:5000
+**Seller:**
+
+- Email: `seller1@example.com` (or seller2...seller10)
+- Password: `password123`
+
+**User:**
+
+- Email: `user1@example.com` (or user2...user50)
+- Password: `password123`
+
+### 📦 Generated Mock Data
+
+The seed script creates realistic data including:
+
+**Products:**
+
+- Smartphones: iPhone 15 Pro, Samsung Galaxy S24 Ultra, OnePlus 12, Google Pixel 8 Pro
+- Laptops: MacBook Air M3, Dell XPS 15, Lenovo ThinkPad X1 Carbon
+- Electronics: Sony WH-1000XM5, Bose QuietComfort 45, Fossil Gen 6, JBL Flip 6
+- Fashion: Nike Air Jordan 1, Adidas Ultraboost, Ray-Ban Aviators
+- Tablets: iPad Pro 12.9 M2
+
+**Features:**
+
+- Multi-platform pricing (2-4 platforms per product)
+- 90 days of historical price data
+- Realistic price fluctuations
+- Product ratings and reviews
+- Platform-specific variations (~2-5% price differences)
+
+### 🔄 Re-seeding Data
+
+To regenerate fresh mock data:
+
+```bash
+cd backend
+npm run seed
 ```
 
 ## 📚 Documentation
@@ -143,18 +201,110 @@ VITE_API_URL=http://localhost:5000
 
 ### For Users
 
-1. **Register/Login** - Create an account or login
-2. **Search Products** - Search for products across platforms
-3. **View Live Deals** - Browse automatically scraped deals
-4. **Track Products** - Add products to your tracklist
-5. **Set Price Alerts** - Get notified when prices drop
-6. **View Analytics** - Check price history and trends
+1. **Register/Login** - Create an account at `/register/user` or login at `/login/user`
+2. **Search Products** - Search for products across Amazon, Flipkart, Meesho, Myntra, and Ajio
+3. **View Live Deals** - Browse automatically scraped deals (updated every 6 hours)
+4. **Track Products** - Add products to your personal tracklist
+5. **Set Price Alerts** - Get notified when product prices drop below your target
+6. **View Analytics** - Check price history charts and trends
+7. **Get Recommendations** - AI-powered buy/wait suggestions based on price patterns
+
+### For Sellers
+
+1. **Register/Login** - Create a seller account at `/register/seller` or login at `/login/seller`
+2. **Monitor Competition** - Track competitor prices and strategies
+3. **View Market Insights** - Analyze market trends and pricing patterns
+4. **Track Interests** - Monitor customer interests and trending products
+5. **Get Analytics** - Access detailed seller dashboard with performance metrics
 
 ### For Admins
 
-1. **Admin Login** - Access admin portal with credentials
-2. **Monitor System** - View scraping jobs and system health
-3. **Manage Users** - User management capabilities
+1. **Admin Login** - Login at `/login/admin` with:
+
+   - Username: `admin`
+   - Password: `admin123`
+
+2. **Admin Dashboard** - View comprehensive platform analytics:
+
+   - Total users, sellers, products, and alerts
+   - User growth trends over time
+   - Category popularity distribution
+
+3. **User Management** (`/admin/users`):
+
+   - View all registered users
+   - Monitor user activity (last login, tracklist size)
+   - Delete inactive users
+
+4. **Seller Management** (`/admin/sellers`):
+
+   - View all registered sellers
+   - Track seller activity and status
+   - Monitor active vs inactive sellers
+
+5. **Product Analytics** (`/admin/products`):
+
+   - View all tracked products
+   - Analyze products by platform and category
+   - Monitor pricing statistics and trends
+
+6. **Sales Trends** (`/admin/trends`):
+
+   - Price tracking activity over time
+   - Alert creation patterns
+   - Top deals by discount percentage
+   - Platform performance comparison
+
+7. **System Logs** (`/admin/logs`):
+
+   - Monitor all system activities
+   - Filter by user, product, or alert activities
+   - Track recent updates and changes
+
+8. **Product CRUD** (`/admin/manage`):
+
+   - Search and filter products
+   - Edit product details (price, category, brand)
+   - Delete invalid or outdated products
+
+9. **Reports Management** (`/admin/reports`):
+   - View user and seller reported issues
+   - Update report status (pending/in-progress/resolved)
+   - Categorize reports by type
+
+### 🔌 API Endpoints
+
+**Admin APIs** (`/api/admin/*` - Requires admin authentication):
+
+- `GET /admin/analytics` - Dashboard analytics
+- `GET /admin/users` - All users with stats
+- `GET /admin/sellers` - All sellers
+- `GET /admin/products` - All products
+- `GET /admin/trends` - Sales trends
+- `GET /admin/logs` - System logs
+- `DELETE /admin/users/:userId` - Delete user
+- `DELETE /admin/products/:productId` - Delete product
+- `PUT /admin/products/:productId` - Update product
+
+**Seller APIs** (`/api/seller/*` - Requires seller authentication):
+
+- `GET /seller/dashboard` - Seller dashboard data
+- `GET /seller/competition` - Competitor analysis
+- `GET /seller/trending` - Trending products
+- `GET /seller/interests` - Customer interests
+- `GET /seller/insights` - Sales insights
+
+**User APIs** (Requires user authentication where noted):
+
+- `GET /api/deals/search` - Search products (public)
+- `GET /api/deals/live` - Get live deals (public)
+- `GET /api/deals/product/:id` - Get product details (public)
+- `GET /api/tracklist` - User's tracklist (auth)
+- `POST /api/tracklist` - Add to tracklist (auth)
+- `DELETE /api/tracklist/:id` - Remove from tracklist (auth)
+- `GET /api/alerts` - User's alerts (auth)
+- `POST /api/alerts` - Create price alert (auth)
+- `GET /api/prices/:productId` - Price history (public)
 
 ## 🔧 Development
 
@@ -162,46 +312,127 @@ VITE_API_URL=http://localhost:5000
 
 ```bash
 cd backend
-npm run dev          # Start development server
-npm run build        # Build for production
+npm run dev          # Start development server with tsx watch mode
+npm run build        # Build TypeScript to JavaScript
 npm start           # Run production build
-npm run cleanup:deals # Clean invalid deals from database
+```
+
+**Utility Scripts:**
+
+```bash
+# Generate mock data (run before first start)
+npm run seed
+
+# Clean invalid deals from database
+npm run cleanup:deals
 ```
 
 ### Frontend Development
 
 ```bash
 cd frontend
-npm run dev          # Start development server
+npm run dev          # Start development server (Vite)
 npm run build        # Build for production
 npm run preview      # Preview production build
 npm run lint         # Run ESLint
 ```
 
+### Database Setup
+
+**MongoDB:**
+
+```bash
+# Local MongoDB
+mongod --dbpath /path/to/data
+
+# Or use MongoDB Atlas (cloud)
+# Update MONGO_URI in backend/.env
+```
+
+**Redis (Optional):**
+
+```bash
+# Start Redis server
+redis-server
+
+# Or use Redis Cloud
+# Update REDIS_URL in backend/.env
+```
+
+**RabbitMQ (Optional):**
+
+```bash
+# Start RabbitMQ server
+rabbitmq-server
+
+# Access management UI
+# http://localhost:15672
+```
+
 ## 🧪 Testing
+
+### Authentication
+
+```bash
+# Admin Login
+curl -X POST http://localhost:5000/api/auth/admin \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# User Registration
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test User","email":"test@example.com","password":"password123"}'
+
+# User Login
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+```
 
 ### Test Scrapers
 
 ```bash
-# Test individual platform scrapers
+# Test Amazon scraper
 curl -X POST http://localhost:5000/api/scrape/amazon \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url": "AMAZON_PRODUCT_URL"}'
+
+# Test Flipkart scraper
+curl -X POST http://localhost:5000/api/scrape/flipkart \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "FLIPKART_PRODUCT_URL"}'
 ```
 
-### Test Search
+### Test Search & Deals
 
 ```bash
 # Search for products
 curl "http://localhost:5000/api/deals/search?query=iPhone%2015"
+
+# Get live deals (no auth required)
+curl "http://localhost:5000/api/deals/live?platform=amazon&limit=10"
+
+# Get live deals with filters
+curl "http://localhost:5000/api/deals/live?platform=flipkart&category=electronics&limit=20"
 ```
 
-### Test Live Deals
+### Test Admin Endpoints
 
 ```bash
-# Get live deals
-curl "http://localhost:5000/api/deals/live?platform=amazon&limit=10"
+# Get admin analytics (requires admin token)
+curl http://localhost:5000/api/admin/analytics \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+
+# Get all users
+curl http://localhost:5000/api/admin/users \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+
+# Get sales trends
+curl http://localhost:5000/api/admin/trends \
+  -H "Authorization: Bearer ADMIN_TOKEN"
 ```
 
 ## 🔒 Security Features
@@ -221,6 +452,38 @@ curl "http://localhost:5000/api/deals/live?platform=amazon&limit=10"
 - Efficient product matching algorithms
 - Background job processing
 - Optimized scraping with request throttling
+
+## 🐛 Troubleshooting
+
+**"No products displayed"**
+
+- Run the seed script: `cd backend && npm run seed`
+- Ensure MongoDB is running
+- Check backend console for errors
+
+**"Connection failed" / Database errors**
+
+- Verify MongoDB is running: `mongod` or check MongoDB service
+- Check MONGODB_URI in `backend/.env`
+- Default: `mongodb://127.0.0.1:27017/markethub`
+
+**"401 Unauthorized" errors**
+
+- Ensure you're logged in
+- Check JWT token in browser localStorage
+- Try logging in again
+
+**Frontend not loading**
+
+- Check if backend is running on port 5000
+- Verify CORS settings in backend
+- Check browser console for errors
+
+**No data after seeding**
+
+- Ensure seed script completed successfully
+- Check MongoDB for collections: `users`, `deals`, `pricehistories`, `alerts`
+- Backend should show: "✅ Mock data generation completed successfully!"
 
 ## 🤝 Contributing
 

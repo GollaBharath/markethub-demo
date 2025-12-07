@@ -109,3 +109,11 @@ export const triggerLiveScraping = async (
 	});
 	return data;
 };
+
+/**
+ * Get product details by ID
+ */
+export const getProductById = async (productId: string): Promise<any> => {
+	const { data } = await api.get(`/deals/product/${productId}`);
+	return data;
+};

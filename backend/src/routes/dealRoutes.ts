@@ -5,6 +5,7 @@ import {
 	getLiveDeals,
 	scrapeAndStoreDeal,
 	triggerLiveScraping,
+	getProductById,
 } from "../controllers/dealController";
 
 const router = express.Router();
@@ -12,6 +13,7 @@ const router = express.Router();
 // Public routes
 router.get("/search", searchProducts);
 router.get("/live", getLiveDeals);
+router.get("/product/:productId", getProductById);
 
 // Protected routes
 router.post("/scrape", protect, scrapeAndStoreDeal);

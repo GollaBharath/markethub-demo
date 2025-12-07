@@ -8,7 +8,8 @@
 		"dev": "ts-node-dev --respawn --transpile-only src/server.ts",
 		"build": "tsc",
 		"start": "node dist/server.js",
-		"cleanup:deals": "ts-node src/utils/cleanupInvalidDeals.ts"
+		"cleanup:deals": "ts-node src/utils/cleanupInvalidDeals.ts",
+		"seed": "ts-node src/utils/generateMockData.ts"
 	},
 	"dependencies": {
 		"amqplib": "^0.10.9",
@@ -22,7 +23,7 @@
 		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^8.3.1",
 		"node-cron": "^4.2.1",
-		"nodemailer": "^6.9.8",
+		"nodemailer": "^7.0.11",
 		"playwright": "^1.40.0",
 		"playwright-extra": "^4.3.6",
 		"puppeteer-extra-plugin-stealth": "^2.11.2",
@@ -30,6 +31,7 @@
 	},
 	"devDependencies": {
 		"@types/amqplib": "^0.10.8",
+		"@types/bcryptjs": "^3.0.0",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/jsonwebtoken": "^9.0.10",

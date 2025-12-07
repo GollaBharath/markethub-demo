@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import type { FutureConfig } from "react-router-dom";
 
 // Layouts
 import { PublicLayout } from "@/components/layouts/PublicLayout";
@@ -41,72 +42,78 @@ import SellerReport from "@/pages/seller/SellerReport";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminSellers from "@/pages/admin/AdminSellers";
+import AdminProducts from "@/pages/admin/AdminProducts";
+import AdminTrends from "@/pages/admin/AdminTrends";
+import AdminLogs from "@/pages/admin/AdminLogs";
+import AdminManage from "@/pages/admin/AdminManage";
 import AdminReports from "@/pages/admin/AdminReports";
 import AdminSettings from "@/pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
 
+const futureConfig = {
+	v7_startTransition: true,
+	v7_relativeSplatPath: true,
+};
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<Landing />} />
-          </Route>
-
-          {/* Auth Routes */}
-          <Route path="/login/user" element={<UserLogin />} />
-          <Route path="/register/user" element={<UserRegister />} />
-          <Route path="/login/seller" element={<SellerLogin />} />
-          <Route path="/register/seller" element={<SellerRegister />} />
-          <Route path="/login/admin" element={<AdminLogin />} />
-
-          {/* User Routes */}
-          <Route element={<DashboardLayout />}>
-            <Route path="/user/dashboard" element={<UserDashboard />} />
-            <Route path="/user/search" element={<UserSearch />} />
-            <Route path="/user/product/:productId" element={<ProductView />} />
-            <Route path="/user/tracklist" element={<UserTracklist />} />
-            <Route path="/user/alerts" element={<UserAlerts />} />
-            <Route path="/user/notifications" element={<UserNotifications />} />
-            <Route path="/user/history" element={<UserHistory />} />
-            <Route path="/user/settings" element={<UserSettings />} />
-            <Route path="/user/report" element={<UserReport />} />
-          </Route>
-
-          {/* Seller Routes */}
-          <Route element={<DashboardLayout />}>
-            <Route path="/seller/dashboard" element={<SellerDashboard />} />
-            <Route path="/seller/competition" element={<SellerCompetition />} />
-            <Route path="/seller/interests" element={<SellerInterests />} />
-            <Route path="/seller/insights" element={<SellerInsights />} />
-            <Route path="/seller/trending" element={<SellerTrending />} />
-            <Route path="/seller/settings" element={<SellerSettings />} />
-            <Route path="/seller/report" element={<SellerReport />} />
-          </Route>
-
-          {/* Admin Routes */}
-          <Route element={<DashboardLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminDashboard />} />
-            <Route path="/admin/sellers" element={<AdminDashboard />} />
-            <Route path="/admin/products" element={<AdminDashboard />} />
-            <Route path="/admin/trends" element={<AdminDashboard />} />
-            <Route path="/admin/logs" element={<AdminDashboard />} />
-            <Route path="/admin/reports" element={<AdminReports />} />
-            <Route path="/admin/manage" element={<AdminDashboard />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
-          </Route>
-
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+	<QueryClientProvider client={queryClient}>
+		<TooltipProvider>
+			<Toaster />
+			<Sonner />
+			<BrowserRouter future={futureConfig}>
+				<Routes>
+					{/* Public Routes */}
+					<Route element={<PublicLayout />}>
+						<Route path="/" element={<Landing />} />
+					</Route>
+					{/* Auth Routes */}
+					<Route path="/login/user" element={<UserLogin />} />
+					<Route path="/register/user" element={<UserRegister />} />
+					<Route path="/login/seller" element={<SellerLogin />} />
+					<Route path="/register/seller" element={<SellerRegister />} />
+					<Route path="/login/admin" element={<AdminLogin />} />
+					{/* User Routes */}
+					<Route element={<DashboardLayout />}>
+						<Route path="/user/dashboard" element={<UserDashboard />} />
+						<Route path="/user/search" element={<UserSearch />} />
+						<Route path="/user/product/:productId" element={<ProductView />} />
+						<Route path="/user/tracklist" element={<UserTracklist />} />
+						<Route path="/user/alerts" element={<UserAlerts />} />
+						<Route path="/user/notifications" element={<UserNotifications />} />
+						<Route path="/user/history" element={<UserHistory />} />
+						<Route path="/user/settings" element={<UserSettings />} />
+						<Route path="/user/report" element={<UserReport />} />
+					</Route>
+					{/* Seller Routes */}
+					<Route element={<DashboardLayout />}>
+						<Route path="/seller/dashboard" element={<SellerDashboard />} />
+						<Route path="/seller/competition" element={<SellerCompetition />} />
+						<Route path="/seller/interests" element={<SellerInterests />} />
+						<Route path="/seller/insights" element={<SellerInsights />} />
+						<Route path="/seller/trending" element={<SellerTrending />} />
+						<Route path="/seller/settings" element={<SellerSettings />} />
+						<Route path="/seller/report" element={<SellerReport />} />
+					</Route>
+					{/* Admin Routes */}
+					<Route element={<DashboardLayout />}>
+						<Route path="/admin/dashboard" element={<AdminDashboard />} />
+						<Route path="/admin/users" element={<AdminUsers />} />
+						<Route path="/admin/sellers" element={<AdminSellers />} />
+						<Route path="/admin/products" element={<AdminProducts />} />
+						<Route path="/admin/trends" element={<AdminTrends />} />
+						<Route path="/admin/logs" element={<AdminLogs />} />
+						<Route path="/admin/reports" element={<AdminReports />} />
+						<Route path="/admin/manage" element={<AdminManage />} />
+						<Route path="/admin/settings" element={<AdminSettings />} />
+					</Route>{" "}
+					<Route path="*" element={<NotFound />} />
+				</Routes>
+			</BrowserRouter>
+		</TooltipProvider>
+	</QueryClientProvider>
 );
 
 export default App;

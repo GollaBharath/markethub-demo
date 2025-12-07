@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getLiveDeals, Deal } from "@/api/dealApi";
-import productsData from "@/data/products.json";
 
 /**
  * Validate deal data to filter out incomplete/invalid deals
@@ -62,48 +61,21 @@ export function useDeals(limit?: number) {
 						setProducts(transformedProducts);
 						setIsFromDatabase(true);
 					} else {
-						// All deals were invalid, use fallback
-						console.log("All deals invalid, using hardcoded products");
-						const fallbackProducts = productsData.products
-							.slice(0, limit || 20)
-							.map((p) => ({
-								...p,
-								buyRecommendation: p.buyRecommendation as
-									| "good"
-									| "neutral"
-									| "high",
-							}));
-						setProducts(fallbackProducts);
+						// All deals were invalid, return empty array
+						console.log("All deals invalid, no products available");
+						setProducts([]);
 						setIsFromDatabase(false);
 					}
 				} else {
-					// Fallback to hardcoded data if no deals in database
-					console.log("No deals in database, using hardcoded products");
-					const fallbackProducts = productsData.products
-						.slice(0, limit || 20)
-						.map((p) => ({
-							...p,
-							buyRecommendation: p.buyRecommendation as
-								| "good"
-								| "neutral"
-								| "high",
-						}));
-					setProducts(fallbackProducts);
+					// No deals in database, return empty array
+					console.log("No deals in database, please run the seed script");
+					setProducts([]);
 					setIsFromDatabase(false);
 				}
 			} catch (error) {
-				console.error("Error fetching deals, using hardcoded products:", error);
-				// Fallback to hardcoded data on error
-				const fallbackProducts = productsData.products
-					.slice(0, limit || 20)
-					.map((p) => ({
-						...p,
-						buyRecommendation: p.buyRecommendation as
-							| "good"
-							| "neutral"
-							| "high",
-					}));
-				setProducts(fallbackProducts);
+				console.error("Error fetching deals:", error);
+				// Return empty array on error
+				setProducts([]);
 				setIsFromDatabase(false);
 			} finally {
 				setLoading(false);
