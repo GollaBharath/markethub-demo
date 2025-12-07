@@ -1,14 +1,11 @@
-import { chromium } from "playwright-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import type { Browser, Page } from "playwright";
+import type { Page } from "playwright";
 import { ScrapedProduct } from "../types";
-
-chromium.use(StealthPlugin());
+import { getBrowserManager } from "./persistentBrowser";
 
 export const scrapeFlipkartProduct = async (
 	rawUrl: string
 ): Promise<ScrapedProduct> => {
-	let browser: Browser | null = null;
+	const browserManager = getBrowserManager();
 
 	try {
 		// Clean the URL
@@ -16,28 +13,16 @@ export const scrapeFlipkartProduct = async (
 
 		console.log("🟦 Scraping Flipkart:", cleanUrl);
 
-		browser = await chromium.launch({
-			headless: true,
-			args: [
-				"--no-sandbox",
-				"--disable-setuid-sandbox",
-				"--disable-dev-shm-usage",
-			],
-		});
-
-		const context = await browser.newContext({
-			viewport: { width: 1366, height: 768 },
-			userAgent:
-				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-		});
-
+		// Get persistent context instead of creating new browser
+		const context = await browserManager.getContext();
 		const page = await context.newPage();
 
-		// Load page
-		await page.goto(cleanUrl, {
-			waitUntil: "domcontentloaded",
-			timeout: 60000,
-		});
+		// Simulate human behavior before navigation
+		await browserManager.navigateWithHumanBehavior(
+			page,
+			cleanUrl,
+			"networkidle"
+		);
 
 		// Wait for JS to execute
 		await page.waitForTimeout(3000);
@@ -50,7 +35,8 @@ export const scrapeFlipkartProduct = async (
 			html.includes("Page Not Found")
 		) {
 			console.log("❌ Blocked by Flipkart");
-			await browser.close();
+			await page.close();
+			await browserManager.saveState();
 			return {
 				title: "Blocked",
 				price: 0,
@@ -103,7 +89,8 @@ export const scrapeFlipkartProduct = async (
 				? parseInt(reviewsText.replace(/[^\d]/g, ""))
 				: 0;
 
-		await browser.close();
+		await page.close();
+		await browserManager.saveState();
 
 		return {
 			title,
@@ -115,7 +102,6 @@ export const scrapeFlipkartProduct = async (
 		};
 	} catch (err) {
 		console.log("❌ FLIPKART SCRAPER ERROR:", err);
-		if (browser) await browser.close();
 		return {
 			title: "Error",
 			price: 0,
